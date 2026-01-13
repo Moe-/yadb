@@ -29,3 +29,13 @@ pub fn attach(args: &Vec<String>) -> Result<i32, &str> {
         Ok(_) => Ok(pid)
     };
 }
+
+
+pub fn resume(pid: i32) {
+        return match ptrace::cont(Pid::from_raw(pid), None) {
+        Err(err) => {
+            panic!("Could not continue!");
+        },
+        Ok(_) => {},
+    };
+}

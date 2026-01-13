@@ -12,10 +12,7 @@ fn main() {
 
     println!("Process PID is {pid}");
 
-    match wait::waitpid(Pid::from_raw(pid), Option::None) {
-        Err(err) => println!("waitpid failed {err}"),
-        Ok(_) => {},
-    }
+    wait_on_signal(pid);
 
     let mut buffer = String::new();
     let mut history = Vec::<String>::new();
@@ -43,4 +40,19 @@ fn main() {
 
 fn handle_command(pid: i32, command: &String) {
     println!("Handle command: {pid} - {command}");
+    let items = command.split(" ").collect::<Vec<&str>>();
+    let first = items[0];
+    println!("starts with {first}");
+    if "continue".starts_with(items[0].trim()) {
+        yadb::attach::resume(pid);
+        wait_on_signal(pid);
+    }
+}
+
+
+fn wait_on_signal(pid: i32) {
+    match wait::waitpid(Pid::from_raw(pid), Option::None) {
+        Err(err) => panic!("waitpid failed {err}"),
+        Ok(_) => {},
+    }
 }
